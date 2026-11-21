@@ -5,130 +5,274 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>普中摄影社 · 测试版下载</title>
 <style>
-  :root {
+  /* ============ 主题变量 ============ */
+  body.theme-cyber {
     --bg: #030806;
     --panel: rgba(0, 20, 14, .72);
-    --green: #00ff9d;
-    --green-dim: rgba(0, 255, 157, .35);
-    --cyan: #00e5ff;
-    --amber: #ffb300;
-    --text: #b8ffde;
-    --dim: rgba(0, 255, 157, .5);
+    --ink: #b8ffde;
+    --accent: #00ff9d;
+    --accent-dim: rgba(0, 255, 157, .35);
+    --accent2: #00e5ff;
+    --warn: #ffb300;
+    --font: "SF Mono", "Cascadia Mono", Menlo, Consolas, "PingFang SC", monospace;
+    --sw-bg: rgba(3, 8, 6, .78);
+    --sw-border: rgba(0, 255, 157, .35);
+  }
+  body.theme-guofeng {
+    --bg: #f6f0e2;
+    --panel: rgba(255, 253, 245, .94);
+    --ink: #2b2620;
+    --accent: #b03a2e;
+    --accent-dim: rgba(176, 58, 46, .3);
+    --accent2: #8c6b3f;
+    --warn: #b03a2e;
+    --font: "Songti SC", "STSong", "SimSun", serif;
+    --sw-bg: rgba(246, 240, 226, .9);
+    --sw-border: rgba(176, 58, 46, .4);
+  }
+  body.theme-official {
+    --bg: #ffffff;
+    --panel: #ffffff;
+    --ink: #0a0a0a;
+    --accent: #0a0a0a;
+    --accent-dim: #e8e8e8;
+    --accent2: #8a8a8a;
+    --warn: #8a8a8a;
+    --font: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    --sw-bg: rgba(255, 255, 255, .92);
+    --sw-border: #e8e8e8;
+  }
+  body.theme-apple {
+    --bg: #f5f5f7;
+    --panel: #ffffff;
+    --ink: #1d1d1f;
+    --accent: #0071e3;
+    --accent-dim: #d2d2d7;
+    --accent2: #6e6e73;
+    --warn: #6e6e73;
+    --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
+    --sw-bg: rgba(255, 255, 255, .85);
+    --sw-border: #d2d2d7;
+  }
+  body.theme-terminal {
+    --bg: #1a1a1a;
+    --panel: #000000;
+    --ink: #e8e8e8;
+    --accent: #33ff66;
+    --accent-dim: rgba(51, 255, 102, .35);
+    --accent2: #00bfff;
+    --warn: #ffcc00;
+    --font: "JetBrains Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+    --sw-bg: rgba(26, 26, 26, .9);
+    --sw-border: rgba(255, 255, 255, .25);
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: "SF Mono", "Cascadia Mono", Menlo, Consolas, "PingFang SC", monospace;
+    font-family: var(--font);
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 30px 18px;
+    padding: 34px 18px 88px;
     background: var(--bg);
-    color: var(--text);
+    color: var(--ink);
     overflow-x: hidden;
     position: relative;
+    transition: background .25s, color .25s;
   }
 
-  /* 赛博网格背景 */
-  .grid {
-    position: fixed;
-    inset: 0;
-    z-index: 0;
+  /* ============ 背景层（各主题差异） ============ */
+  .bg-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  .theme-cyber .bg-layer {
     background:
       linear-gradient(rgba(0, 255, 157, .06) 1px, transparent 1px),
       linear-gradient(90deg, rgba(0, 255, 157, .06) 1px, transparent 1px),
-      radial-gradient(ellipse at 50% 0%, rgba(0, 255, 157, .10), transparent 60%),
-      var(--bg);
-    background-size: 34px 34px, 34px 34px, 100% 100%, 100% 100%;
+      radial-gradient(ellipse at 50% 0%, rgba(0, 255, 157, .10), transparent 60%);
+    background-size: 34px 34px, 34px 34px, 100% 100%;
+  }
+  .theme-guofeng .bg-layer {
+    background:
+      repeating-linear-gradient(0deg, rgba(139, 90, 43, .028) 0 1px, transparent 1px 3px),
+      radial-gradient(ellipse at 50% 30%, rgba(176, 58, 46, .06), transparent 65%);
+  }
+  .theme-apple .bg-layer {
+    background: radial-gradient(ellipse at 50% 0%, #ffffff, #f5f5f7 70%);
+  }
+  .theme-terminal .bg-layer { background: transparent; }
+
+  /* CRT 扫描线（仅赛博） */
+  .fx-scanlines {
+    position: fixed; inset: 0; z-index: 3; pointer-events: none;
+    display: none;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,.16) 0 1px, transparent 1px 3px);
+    animation: crt 6s steps(60) infinite;
+  }
+  .theme-cyber .fx-scanlines { display: block; }
+  @keyframes crt {
+    0%, 100%, 92%, 94%, 98% { opacity: 1; }
+    93%, 97% { opacity: .65; }
   }
 
-  /* CRT 扫描线 */
-  .scanlines {
-    position: fixed;
-    inset: 0;
-    z-index: 3;
-    pointer-events: none;
-    background: repeating-linear-gradient(
-      0deg,
-      rgba(0, 0, 0, .16) 0px, rgba(0, 0, 0, .16) 1px,
-      transparent 1px, transparent 3px
-    );
-    animation: crt-flicker 6s steps(60) infinite;
-  }
-  @keyframes crt-flicker {
-    0%, 100% { opacity: 1; }
-    92% { opacity: 1; }
-    93% { opacity: .6; }
-    94% { opacity: 1; }
-    97% { opacity: .8; }
-    98% { opacity: 1; }
-  }
-
+  /* ============ 面板 ============ */
   .panel {
     position: relative;
     z-index: 2;
     width: 100%;
     max-width: 400px;
-    background: var(--panel);
-    border: 1px solid var(--green-dim);
-    box-shadow: 0 0 24px rgba(0, 255, 157, .12), inset 0 0 40px rgba(0, 255, 157, .04);
     padding: 40px 26px 30px;
+    transition: background .25s, border .25s, box-shadow .25s;
+  }
+  .theme-cyber .panel {
+    background: var(--panel);
+    border: 1px solid var(--accent-dim);
+    box-shadow: 0 0 24px rgba(0, 255, 157, .12), inset 0 0 40px rgba(0, 255, 157, .04);
+  }
+  .theme-guofeng .panel {
+    background: var(--panel);
+    border: 1px solid #8c6b3f;
+    outline: 4px double rgba(140, 107, 63, .5);
+    outline-offset: 6px;
+    box-shadow: 0 12px 32px rgba(43, 38, 32, .10);
+  }
+  .theme-official .panel {
+    background: var(--panel);
+    border: 1px solid var(--accent-dim);
+    box-shadow: none;
+  }
+  .theme-apple .panel {
+    background: var(--panel);
+    border: none;
+    border-radius: 24px;
+    box-shadow: 0 10px 36px rgba(0, 0, 0, .07);
+  }
+  .theme-terminal .panel {
+    background: var(--panel);
+    border: 1px solid #3a3a3a;
+    border-radius: 10px;
+    box-shadow: 0 14px 40px rgba(0, 0, 0, .55);
   }
 
-  /* 四角 HUD 括号 */
-  .panel::before, .panel::after,
+  /* HUD 四角括号（仅赛博） */
+  .corner { display: none; }
+  .theme-cyber .corner { display: block; }
   .corner::before, .corner::after {
     content: "";
     position: absolute;
     width: 18px; height: 18px;
-    border: 2px solid var(--green);
+    border: 2px solid var(--accent);
     pointer-events: none;
   }
-  .panel::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
-  .panel::after { top: -2px; right: -2px; border-left: none; border-bottom: none; }
-  .corner::before { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+  .corner::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
   .corner::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
 
-  /* 顶部状态行 */
+  /* 终端窗口标题栏（仅终端风） */
+  .term-bar {
+    display: none;
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 34px;
+    border-radius: 9px 9px 0 0;
+    background: #2d2d2d;
+    border-bottom: 1px solid #3a3a3a;
+    align-items: center;
+    padding: 0 12px;
+  }
+  .theme-terminal .term-bar { display: flex; }
+  .term-bar .t {
+    width: 11px; height: 11px; border-radius: 50%;
+    margin-right: 7px;
+  }
+  .term-bar .t.r { background: #ff5f57; }
+  .term-bar .t.y { background: #febc2e; }
+  .term-bar .t.g { background: #28c840; }
+  .term-bar .title {
+    flex: 1; text-align: center;
+    color: #9a9a9a; font-size: 11px; letter-spacing: 1px;
+  }
+  .theme-terminal .panel { padding-top: 64px; }
+
+  /* 国风印章（仅国风） */
+  .stamp {
+    display: none;
+    position: absolute;
+    top: 18px; right: 22px;
+    width: 52px; height: 52px;
+    background: var(--accent);
+    color: #fdf8ec;
+    font-family: "Kaiti SC", "STKaiti", "KaiTi", serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-align: center;
+    line-height: 52px;
+    border-radius: 6px;
+    transform: rotate(8deg);
+    box-shadow: 0 4px 10px rgba(176, 58, 46, .35);
+  }
+  .theme-guofeng .stamp { display: block; }
+
+  /* ============ 内容 ============ */
   .status {
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 10px;
     letter-spacing: 2px;
-    color: var(--dim);
+    color: var(--accent2);
     margin-bottom: 26px;
+    opacity: .9;
   }
-  .status .online { color: var(--green); }
-  .status .dot {
+  .theme-cyber .status .dot {
     display: inline-block;
     width: 7px; height: 7px;
     border-radius: 50%;
-    background: var(--green);
+    background: var(--accent);
     margin-right: 6px;
     animation: blink 1.2s step-end infinite;
   }
+  .theme-terminal .status .dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    margin-right: 6px;
+  }
   @keyframes blink { 50% { opacity: .15; } }
 
-  /* 故障字标题 */
-  .glitch {
+  .title {
     font-size: 30px;
     font-weight: 700;
     letter-spacing: 6px;
-    color: var(--green);
+    color: var(--ink);
     text-align: center;
-    position: relative;
+  }
+  .theme-cyber .title {
+    color: var(--accent);
     text-shadow: 0 0 12px rgba(0, 255, 157, .55);
     animation: glitch 3.2s infinite;
   }
+  .theme-guofeng .title {
+    font-family: "Kaiti SC", "STKaiti", "KaiTi", serif;
+    font-size: 34px;
+    letter-spacing: 10px;
+    color: #2b2620;
+  }
+  .theme-apple .title { font-size: 34px; letter-spacing: 2px; font-weight: 700; }
+  .theme-terminal .title {
+    font-size: 24px;
+    letter-spacing: 2px;
+    text-align: left;
+    color: var(--accent);
+    font-weight: 400;
+  }
   @keyframes glitch {
-    0%, 86%, 100% { transform: translate(0); text-shadow: 0 0 12px rgba(0, 255, 157, .55); }
-    87% { transform: translate(-2px, 1px); text-shadow: -3px 0 var(--cyan), 3px 0 var(--amber); }
-    89% { transform: translate(2px, -1px); text-shadow: 3px 0 var(--cyan), -3px 0 var(--amber); }
-    91% { transform: translate(0); text-shadow: 0 0 12px rgba(0, 255, 157, .55); }
-    95% { transform: translate(1px, 0); text-shadow: -2px 0 var(--cyan), 2px 0 var(--amber); }
+    0%, 86%, 100% { transform: translate(0); text-shadow: 0 0 12px rgba(0,255,157,.55); }
+    87% { transform: translate(-2px, 1px); text-shadow: -3px 0 var(--accent2), 3px 0 var(--warn); }
+    89% { transform: translate(2px, -1px); text-shadow: 3px 0 var(--accent2), -3px 0 var(--warn); }
+    91% { transform: translate(0); text-shadow: 0 0 12px rgba(0,255,157,.55); }
+    95% { transform: translate(1px, 0); text-shadow: -2px 0 var(--accent2), 2px 0 var(--warn); }
     96% { transform: translate(0); }
   }
 
@@ -136,33 +280,64 @@
     text-align: center;
     font-size: 10px;
     letter-spacing: 4px;
-    color: var(--dim);
+    color: var(--accent2);
     margin-top: 12px;
     text-transform: uppercase;
   }
+  .theme-guofeng .sub { letter-spacing: 8px; font-size: 11px; color: #8c6b3f; }
+  .theme-official .sub { letter-spacing: 6px; color: #8a8a8a; }
+  .theme-apple .sub { font-size: 14px; letter-spacing: 1px; color: #6e6e73; text-transform: none; }
+  .theme-terminal .sub { text-align: left; color: #9a9a9a; }
 
-  /* 终端读数区 */
   .readout {
     margin-top: 30px;
-    border-top: 1px dashed var(--green-dim);
-    border-bottom: 1px dashed var(--green-dim);
+    border-top: 1px dashed var(--accent-dim);
+    border-bottom: 1px dashed var(--accent-dim);
     padding: 16px 4px;
     font-size: 12px;
     line-height: 2.1;
     letter-spacing: 1px;
-    color: var(--dim);
+    color: var(--accent2);
   }
-  .readout .k { color: var(--cyan); }
-  .readout .v { color: var(--green); }
-  .readout .cursor {
-    display: inline-block;
+  .readout .v { color: var(--accent); }
+  .theme-guofeng .readout {
+    border-top: 1px solid rgba(140, 107, 63, .4);
+    border-bottom: 1px solid rgba(140, 107, 63, .4);
+    color: #6b5a41;
+    font-size: 13px;
+  }
+  .theme-guofeng .readout .v { color: var(--accent); }
+  .theme-official .readout {
+    border-top: 1px solid #e8e8e8;
+    border-bottom: 1px solid #e8e8e8;
+    color: #8a8a8a;
+  }
+  .theme-official .readout .v { color: #0a0a0a; }
+  .theme-apple .readout {
+    border: none;
+    background: #f5f5f7;
+    border-radius: 14px;
+    color: #6e6e73;
+    padding: 16px;
+    font-size: 13px;
+  }
+  .theme-apple .readout .v { color: #1d1d1f; }
+  .theme-terminal .readout {
+    border: none;
+    color: #c8c8c8;
+    padding: 8px 0;
+  }
+  .theme-terminal .readout .v { color: var(--accent); }
+
+  .cursor {
+    display: none;
     width: 8px; height: 14px;
-    background: var(--green);
+    background: var(--accent);
     vertical-align: -2px;
     animation: blink 1s step-end infinite;
   }
+  .theme-cyber .cursor, .theme-terminal .cursor { display: inline-block; }
 
-  /* 下载按钮 */
   .dl {
     display: block;
     margin-top: 30px;
@@ -171,64 +346,162 @@
     font-size: 15px;
     font-weight: 700;
     letter-spacing: 4px;
-    color: var(--green);
+    color: var(--accent);
     text-decoration: none;
-    border: 1px solid var(--green);
+    border: 1px solid var(--accent);
+    background: transparent;
+    transition: background .12s, color .12s, box-shadow .12s;
+  }
+  .theme-cyber .dl {
     background: rgba(0, 255, 157, .07);
     box-shadow: 0 0 18px rgba(0, 255, 157, .22), inset 0 0 18px rgba(0, 255, 157, .06);
-    transition: background .12s, box-shadow .12s;
     animation: dl-pulse 2.4s ease-in-out infinite;
   }
   @keyframes dl-pulse {
-    0%, 100% { box-shadow: 0 0 18px rgba(0, 255, 157, .22), inset 0 0 18px rgba(0, 255, 157, .06); }
-    50% { box-shadow: 0 0 34px rgba(0, 255, 157, .45), inset 0 0 24px rgba(0, 255, 157, .12); }
+    0%, 100% { box-shadow: 0 0 18px rgba(0,255,157,.22), inset 0 0 18px rgba(0,255,157,.06); }
+    50% { box-shadow: 0 0 34px rgba(0,255,157,.45), inset 0 0 24px rgba(0,255,157,.12); }
   }
-  .dl:active { background: var(--green); color: var(--bg); }
+  .theme-cyber .dl:active { background: var(--accent); color: var(--bg); }
+  .theme-guofeng .dl {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fdf8ec;
+    letter-spacing: 8px;
+    border-radius: 2px;
+    font-family: "Kaiti SC", "STKaiti", "KaiTi", serif;
+    font-size: 17px;
+    box-shadow: 0 6px 16px rgba(176, 58, 46, .3);
+  }
+  .theme-official .dl {
+    color: #0a0a0a;
+    border-color: #0a0a0a;
+    border-radius: 50px;
+    font-weight: 500;
+    letter-spacing: 3px;
+    font-size: 14px;
+  }
+  .theme-official .dl:active { background: #0a0a0a; color: #ffffff; }
+  .theme-apple .dl {
+    background: var(--accent);
+    border: none;
+    border-radius: 50px;
+    color: #ffffff;
+    letter-spacing: 2px;
+    font-size: 16px;
+    box-shadow: none;
+  }
+  .theme-apple .dl:active { background: #0062c4; }
+  .theme-terminal .dl {
+    border: 1px solid #3a3a3a;
+    border-radius: 4px;
+    color: var(--accent);
+    background: #0d0d0d;
+    text-align: left;
+    padding-left: 14px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    font-size: 14px;
+  }
+  .theme-terminal .dl::before { content: "$ ./"; color: #9a9a9a; }
+  .theme-terminal .dl:active { background: #1d1d1d; }
 
   .foot {
     margin-top: 28px;
     font-size: 10px;
     letter-spacing: 1px;
     line-height: 2.1;
-    color: var(--dim);
+    color: var(--accent2);
     text-align: center;
+    opacity: .9;
   }
-  .foot .warn { color: var(--amber); }
+  .foot .warn { color: var(--warn); }
+  .theme-guofeng .foot { color: #6b5a41; }
+  .theme-apple .foot { color: #6e6e73; font-size: 11px; letter-spacing: 0; }
+  .theme-terminal .foot { text-align: left; color: #9a9a9a; }
 
-  /* 底部装饰条 */
   .hex {
     margin-top: 22px;
     font-size: 9px;
     letter-spacing: 3px;
-    color: rgba(0, 255, 157, .28);
+    color: var(--accent2);
+    opacity: .35;
     text-align: center;
     overflow: hidden;
     white-space: nowrap;
   }
+  .theme-guofeng .hex, .theme-official .hex, .theme-apple .hex, .theme-terminal .hex { display: none; }
+
+  /* ============ 风格切换器 ============ */
+  .switcher {
+    position: fixed;
+    left: 50%;
+    bottom: 18px;
+    transform: translateX(-50%);
+    z-index: 9;
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 92vw;
+    padding: 6px;
+    background: var(--sw-bg);
+    border: 1px solid var(--sw-border);
+    border-radius: 50px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: background .25s, border .25s;
+  }
+  .switcher button {
+    font-family: inherit;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 7px 13px;
+    border: none;
+    border-radius: 50px;
+    background: transparent;
+    color: var(--accent2);
+    cursor: pointer;
+    transition: background .15s, color .15s;
+    white-space: nowrap;
+  }
+  .switcher button.active {
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 600;
+  }
+  .theme-guofeng .switcher button.active,
+  .theme-official .switcher button.active,
+  .theme-apple .switcher button.active { color: #ffffff; }
 </style>
 </head>
-<body>
-  <div class="grid"></div>
-  <div class="scanlines"></div>
+<body class="theme-cyber">
+  <div class="bg-layer"></div>
+  <div class="fx-scanlines"></div>
 
   <div class="panel">
     <div class="corner"></div>
+    <div class="term-bar">
+      <span class="t r"></span><span class="t y"></span><span class="t g"></span>
+      <span class="title">pcpths@dev: ~/test</span>
+    </div>
+    <div class="stamp">测试</div>
+
     <div class="status">
-      <span><span class="dot"></span><span class="online">ONLINE</span></span>
+      <span><span class="dot"></span><span>ONLINE</span></span>
       <span>PCPTHS-TEST-CHANNEL</span>
     </div>
 
-    <div class="glitch">普中摄影社</div>
+    <div class="title">普中摄影社</div>
     <div class="sub">—— Developer Access Only ——</div>
 
     <div class="readout">
       &gt; 系统: 测试版通道 <span class="v">已连接</span><br>
-      &gt; 版本: <span class="k">VER</span> <span class="v">1.0.3</span><br>
-      &gt; 代号: <span class="k">BUILD</span> <span class="v">5</span><br>
+      &gt; 版本: <span class="v">1.0.3</span><br>
+      &gt; 代号: <span class="v">5</span><br>
       &gt; 状态: <span class="v">待下载</span><span class="cursor"></span>
     </div>
 
-    <a class="dl" href="pcpths-android.apk">[ 下载测试版 ]</a>
+    <a class="dl" href="pcpths-android.apk">下载测试版</a>
 
     <div class="foot">
       测试版与正式版互不干扰，可同时安装<br>
@@ -238,5 +511,40 @@
 
     <div class="hex">0x50435054 0x4853 0x54455354 0x4B494C4C 0x45525357 0x49544348</div>
   </div>
+
+  <div class="switcher" id="switcher">
+    <button data-theme="cyber">赛博科技</button>
+    <button data-theme="guofeng">中华国风</button>
+    <button data-theme="official">摄影社网站风</button>
+    <button data-theme="apple">Apple 风</button>
+    <button data-theme="terminal">Linux 终端风</button>
+  </div>
+
+<script>
+  (function () {
+    var themes = ["cyber", "guofeng", "official", "apple", "terminal"];
+    var body = document.body;
+    var saved = null;
+    try { saved = localStorage.getItem("pcpths-test-theme"); } catch (e) {}
+    if (themes.indexOf(saved) >= 0) {
+      body.className = "theme-" + saved;
+    }
+    var buttons = document.querySelectorAll("#switcher button");
+    function refresh() {
+      var cur = body.className.replace("theme-", "");
+      buttons.forEach(function (b) {
+        b.classList.toggle("active", b.dataset.theme === cur);
+      });
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener("click", function () {
+        body.className = "theme-" + b.dataset.theme;
+        try { localStorage.setItem("pcpths-test-theme", b.dataset.theme); } catch (e) {}
+        refresh();
+      });
+    });
+    refresh();
+  })();
+</script>
 </body>
 </html>
