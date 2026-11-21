@@ -75,7 +75,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 34px 18px 88px;
+    padding: 28px 18px;
     background: var(--bg);
     color: var(--ink);
     overflow-x: hidden;
@@ -431,31 +431,24 @@
   }
   .theme-guofeng .hex, .theme-official .hex, .theme-apple .hex, .theme-terminal .hex { display: none; }
 
-  /* ============ 风格切换器 ============ */
+  /* ============ 风格切换器（嵌在卡片底部，不悬浮、不遮挡） ============ */
   .switcher {
-    position: fixed;
-    left: 50%;
-    bottom: 18px;
-    transform: translateX(-50%);
-    z-index: 9;
     display: flex;
     gap: 4px;
     flex-wrap: wrap;
     justify-content: center;
-    max-width: 92vw;
+    margin-top: 26px;
     padding: 6px;
     background: var(--sw-bg);
     border: 1px solid var(--sw-border);
     border-radius: 50px;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     transition: background .25s, border .25s;
   }
   .switcher button {
     font-family: inherit;
-    font-size: 12px;
+    font-size: 11px;
     letter-spacing: 1px;
-    padding: 7px 13px;
+    padding: 6px 11px;
     border: none;
     border-radius: 50px;
     background: transparent;
@@ -510,14 +503,14 @@
     </div>
 
     <div class="hex">0x50435054 0x4853 0x54455354 0x4B494C4C 0x45525357 0x49544348</div>
-  </div>
 
-  <div class="switcher" id="switcher">
-    <button data-theme="cyber">赛博科技</button>
-    <button data-theme="guofeng">中华国风</button>
-    <button data-theme="official">摄影社网站风</button>
-    <button data-theme="apple">Apple 风</button>
-    <button data-theme="terminal">Linux 终端风</button>
+    <div class="switcher" id="switcher">
+      <button data-theme="cyber">赛博科技</button>
+      <button data-theme="guofeng">中华国风</button>
+      <button data-theme="official">摄影社网站风</button>
+      <button data-theme="apple">Apple 风</button>
+      <button data-theme="terminal">Linux 终端风</button>
+    </div>
   </div>
 
 <script>
