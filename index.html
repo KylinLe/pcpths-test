@@ -5,83 +5,182 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>普中摄影社 · 测试版下载</title>
 <style>
-  :root {
-    --paper: #ffffff;
-    --ink: #0a0a0a;
-    --muted: #8a8a8a;
-    --line: #e8e8e8;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --paper: #0a0a0a;
-      --ink: #f5f5f5;
-      --muted: #7a7a7a;
-      --line: #2a2a2a;
-    }
-  }
   * { margin: 0; padding: 0; box-sizing: border-box; }
+
   body {
     font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: var(--paper);
-    color: var(--ink);
     min-height: 100vh;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 32px 24px;
+    padding: 28px 20px;
+    background: #0b0b1f;
+    overflow-x: hidden;
+    position: relative;
   }
+
+  /* 流动渐变背景 */
+  .bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(135deg, #1a0533, #0b0b1f 40%, #0a1f33 75%, #120a2e);
+    background-size: 300% 300%;
+    animation: shift 14s ease infinite;
+  }
+  @keyframes shift {
+    0%, 100% { background-position: 0% 0%; }
+    50% { background-position: 100% 100%; }
+  }
+
+  /* 漂浮光斑 */
+  .blob {
+    position: fixed;
+    z-index: 1;
+    border-radius: 50%;
+    filter: blur(70px);
+    opacity: .55;
+    animation: float 9s ease-in-out infinite;
+  }
+  .blob.pink { width: 260px; height: 260px; background: #ff2d78; top: -60px; left: -60px; }
+  .blob.blue { width: 300px; height: 300px; background: #3d7bff; bottom: -80px; right: -70px; animation-delay: -3s; }
+  .blob.violet { width: 180px; height: 180px; background: #9b4dff; top: 45%; left: 60%; animation-delay: -6s; }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(30px, -25px) scale(1.12); }
+  }
+
   .card {
+    position: relative;
+    z-index: 2;
     width: 100%;
-    max-width: 380px;
+    max-width: 400px;
     text-align: center;
+    background: rgba(255, 255, 255, .07);
+    border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 28px;
+    padding: 44px 28px 34px;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .45);
   }
-  h1 { font-size: 24px; letter-spacing: 4px; font-weight: 700; }
-  .en { font-size: 11px; letter-spacing: 3px; color: var(--muted); margin-top: 8px; }
-  .meta {
-    margin-top: 28px;
-    font-size: 13px;
-    letter-spacing: 1px;
-    color: var(--muted);
-    line-height: 2;
-  }
-  .meta b { color: var(--ink); font-weight: 600; }
-  .dl {
-    display: inline-block;
-    margin-top: 32px;
-    padding: 14px 48px;
-    border: 1px solid var(--ink);
+
+  /* 旋转的 BETA 徽章 */
+  .badge {
+    position: absolute;
+    top: -16px;
+    right: 22px;
+    background: linear-gradient(135deg, #ff2d78, #ff8a00);
+    color: #fff;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 3px;
+    padding: 8px 16px;
     border-radius: 50px;
-    font-size: 15px;
-    letter-spacing: 2px;
-    color: var(--ink);
-    text-decoration: none;
-    font-weight: 500;
+    box-shadow: 0 6px 18px rgba(255, 45, 120, .5);
+    animation: wiggle 3.5s ease-in-out infinite;
   }
-  .dl:active { background: var(--ink); color: var(--paper); }
+  @keyframes wiggle {
+    0%, 100% { transform: rotate(-4deg); }
+    50% { transform: rotate(4deg); }
+  }
+
+  .lab { font-size: 56px; line-height: 1; animation: bounce 2.4s ease-in-out infinite; }
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+
+  h1 {
+    margin-top: 18px;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 5px;
+    background: linear-gradient(90deg, #ff2d78, #ff8a00, #ffd23d);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .en {
+    margin-top: 10px;
+    font-size: 11px;
+    letter-spacing: 5px;
+    color: rgba(255, 255, 255, .45);
+    text-transform: uppercase;
+  }
+
+  .meta {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 26px;
+  }
+  .chip {
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, .85);
+    background: rgba(255, 255, 255, .10);
+    border: 1px solid rgba(255, 255, 255, .18);
+    padding: 7px 14px;
+    border-radius: 50px;
+  }
+  .chip b { font-weight: 700; color: #ffd23d; }
+
+  .dl {
+    display: block;
+    margin-top: 34px;
+    padding: 18px 20px;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #ff2d78, #ff8a00);
+    color: #fff;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-decoration: none;
+    box-shadow: 0 10px 30px rgba(255, 45, 120, .45);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(255, 45, 120, .45); }
+    50% { transform: scale(1.035); box-shadow: 0 14px 40px rgba(255, 138, 0, .6); }
+  }
+  .dl:active { transform: scale(.97); }
+
   .note {
-    margin-top: 32px;
+    margin-top: 30px;
     font-size: 11px;
     letter-spacing: 1px;
-    color: var(--muted);
-    line-height: 1.9;
+    line-height: 2;
+    color: rgba(255, 255, 255, .5);
   }
+  .note span { color: #ffd23d; }
 </style>
 </head>
 <body>
+  <div class="bg"></div>
+  <div class="blob pink"></div>
+  <div class="blob blue"></div>
+  <div class="blob violet"></div>
+
   <div class="card">
-    <h1>普中摄影社 · 测试版</h1>
-    <div class="en">PCPTHS · TEST BUILD</div>
+    <div class="badge">BETA</div>
+    <div class="lab">🧪</div>
+    <h1>测试实验室</h1>
+    <div class="en">PCPTHS · Developer Channel</div>
+
     <div class="meta">
-      测试版 · 版本 <b>1.0.3</b><br>
-      内部代号 <b>5</b>
+      <div class="chip">版本 <b>1.0.3</b></div>
+      <div class="chip">代号 <b>5</b></div>
     </div>
-    <a class="dl" href="pcpths-android.apk">下载测试版</a>
+
+    <a class="dl" href="pcpths-android.apk">🚀 下载测试版</a>
+
     <div class="note">
-      本页为开发者专属测试通道<br>
+      开发者专属通道 · 仅自己人使用<br>
       测试版与正式版互不干扰，可同时安装<br>
-      应用名「普中摄影社·测试」<br>
-      正式版请从官网「APP 下载」获取
+      应用名「<span>普中摄影社·测试</span>」<br>
+      安装时请允许「安装未知应用」
     </div>
   </div>
 </body>
