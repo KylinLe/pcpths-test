@@ -148,10 +148,10 @@
     box-shadow: 0 10px 36px rgba(0, 0, 0, .07);
   }
   .theme-terminal .panel {
-    background: var(--panel);
-    border: 1px solid #3a3a3a;
-    border-radius: 10px;
-    box-shadow: 0 14px 40px rgba(0, 0, 0, .55);
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 20px 4px 10px;
   }
 
   /* HUD 四角括号（仅赛博） */
@@ -166,32 +166,6 @@
   }
   .corner::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
   .corner::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
-
-  /* 终端窗口标题栏（仅终端风） */
-  .term-bar {
-    display: none;
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 34px;
-    border-radius: 9px 9px 0 0;
-    background: #2d2d2d;
-    border-bottom: 1px solid #3a3a3a;
-    align-items: center;
-    padding: 0 12px;
-  }
-  .theme-terminal .term-bar { display: flex; }
-  .term-bar .t {
-    width: 11px; height: 11px; border-radius: 50%;
-    margin-right: 7px;
-  }
-  .term-bar .t.r { background: #ff5f57; }
-  .term-bar .t.y { background: #febc2e; }
-  .term-bar .t.g { background: #28c840; }
-  .term-bar .title {
-    flex: 1; text-align: center;
-    color: #9a9a9a; font-size: 11px; letter-spacing: 1px;
-  }
-  .theme-terminal .panel { padding-top: 64px; }
 
   /* 国风印章（仅国风） */
   .stamp {
@@ -429,7 +403,51 @@
     overflow: hidden;
     white-space: nowrap;
   }
-  .theme-guofeng .hex, .theme-official .hex, .theme-apple .hex, .theme-terminal .hex { display: none; }
+  .theme-guofeng .hex, .theme-official .hex, .theme-apple .hex { display: none; }
+
+  /* ============ Linux 终端风：纯文字交互终端（无窗口、等字号、全英文、输入 download 下载） ============ */
+  .term-body { display: none; }
+  .theme-terminal .status,
+  .theme-terminal .title,
+  .theme-terminal .sub,
+  .theme-terminal .readout,
+  .theme-terminal .dl,
+  .theme-terminal .foot,
+  .theme-terminal .hex { display: none; }
+  .theme-terminal .term-body {
+    display: block;
+    width: 100%;
+    text-align: left;
+  }
+  .theme-terminal .term-out,
+  .theme-terminal .term-in {
+    font-size: 14px;
+    line-height: 1.8;
+    letter-spacing: .5px;
+    color: #33ff66;
+  }
+  .theme-terminal .term-out {
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+  .theme-terminal .term-in {
+    display: flex;
+    align-items: center;
+  }
+  .theme-terminal .term-prompt { color: #33ff66; }
+  .theme-terminal .term-in input {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #33ff66;
+    font-family: inherit;
+    font-size: 14px;
+    letter-spacing: .5px;
+    caret-color: #33ff66;
+    padding: 0;
+  }
 
   /* ============ 风格切换器（嵌在卡片底部，不悬浮、不遮挡） ============ */
   .switcher {
@@ -473,10 +491,6 @@
 
   <div class="panel">
     <div class="corner"></div>
-    <div class="term-bar">
-      <span class="t r"></span><span class="t y"></span><span class="t g"></span>
-      <span class="title">pcpths@dev: ~/test</span>
-    </div>
     <div class="stamp">测试</div>
 
     <div class="status">
@@ -504,6 +518,11 @@
 
     <div class="hex">0x50435054 0x4853 0x54455354 0x4B494C4C 0x45525357 0x49544348</div>
 
+    <div class="term-body">
+      <div class="term-out" id="term-out"></div>
+      <div class="term-in"><span class="term-prompt">$&nbsp;</span><input id="term-input" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="terminal input"></div>
+    </div>
+
     <div class="switcher" id="switcher">
       <button data-theme="cyber">赛博科技</button>
       <button data-theme="guofeng">中华国风</button>
@@ -515,6 +534,10 @@
 
 <script>
   (function () {
+    var VERSION = "1.0.3";
+    var BUILD = "5";
+    var APK = "pcpths-android.apk";
+
     var themes = ["cyber", "guofeng", "official", "apple", "terminal"];
     var body = document.body;
     var saved = null;
@@ -534,9 +557,63 @@
         body.className = "theme-" + b.dataset.theme;
         try { localStorage.setItem("pcpths-test-theme", b.dataset.theme); } catch (e) {}
         refresh();
+        if (b.dataset.theme === "terminal") { bootTerminal(); }
       });
     });
     refresh();
+
+    /* ---- 交互式终端 ---- */
+    var out = document.getElementById("term-out");
+    var input = document.getElementById("term-input");
+    var booted = false;
+
+    function print(line) {
+      var div = document.createElement("div");
+      div.textContent = line;
+      out.appendChild(div);
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function bootTerminal() {
+      if (booted) { input.focus(); return; }
+      booted = true;
+      print("PCPTHS Test Channel v" + VERSION + " (build " + BUILD + ")");
+      print("Type 'download' to get the test build.");
+      print("Type 'help' for available commands.");
+      input.focus();
+    }
+
+    input.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter") return;
+      var cmd = input.value.trim();
+      print("$ " + cmd);
+      input.value = "";
+      if (cmd === "download") {
+        print("Downloading " + APK + " ...");
+        var a = document.createElement("a");
+        a.href = APK;
+        a.download = APK;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      } else if (cmd === "help") {
+        print("download   get the latest test build");
+        print("ver        show version info");
+        print("clear      clear the screen");
+      } else if (cmd === "ver") {
+        print("version " + VERSION + "  build " + BUILD);
+      } else if (cmd === "clear") {
+        out.innerHTML = "";
+      } else if (cmd !== "") {
+        print("command not found: " + cmd);
+      }
+    });
+
+    // 点击终端区域任意处聚焦输入框（移动端方便唤起键盘）
+    var termBody = document.querySelector(".term-body");
+    termBody.addEventListener("click", function () { input.focus(); });
+
+    if (body.className === "theme-terminal") { bootTerminal(); }
   })();
 </script>
 </body>
