@@ -5,183 +5,238 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>普中摄影社 · 测试版下载</title>
 <style>
+  :root {
+    --bg: #030806;
+    --panel: rgba(0, 20, 14, .72);
+    --green: #00ff9d;
+    --green-dim: rgba(0, 255, 157, .35);
+    --cyan: #00e5ff;
+    --amber: #ffb300;
+    --text: #b8ffde;
+    --dim: rgba(0, 255, 157, .5);
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-family: "SF Mono", "Cascadia Mono", Menlo, Consolas, "PingFang SC", monospace;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 28px 20px;
-    background: #0b0b1f;
+    padding: 30px 18px;
+    background: var(--bg);
+    color: var(--text);
     overflow-x: hidden;
     position: relative;
   }
 
-  /* 流动渐变背景 */
-  .bg {
+  /* 赛博网格背景 */
+  .grid {
     position: fixed;
     inset: 0;
     z-index: 0;
-    background: linear-gradient(135deg, #1a0533, #0b0b1f 40%, #0a1f33 75%, #120a2e);
-    background-size: 300% 300%;
-    animation: shift 14s ease infinite;
-  }
-  @keyframes shift {
-    0%, 100% { background-position: 0% 0%; }
-    50% { background-position: 100% 100%; }
+    background:
+      linear-gradient(rgba(0, 255, 157, .06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 255, 157, .06) 1px, transparent 1px),
+      radial-gradient(ellipse at 50% 0%, rgba(0, 255, 157, .10), transparent 60%),
+      var(--bg);
+    background-size: 34px 34px, 34px 34px, 100% 100%, 100% 100%;
   }
 
-  /* 漂浮光斑 */
-  .blob {
+  /* CRT 扫描线 */
+  .scanlines {
     position: fixed;
-    z-index: 1;
-    border-radius: 50%;
-    filter: blur(70px);
-    opacity: .55;
-    animation: float 9s ease-in-out infinite;
+    inset: 0;
+    z-index: 3;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, .16) 0px, rgba(0, 0, 0, .16) 1px,
+      transparent 1px, transparent 3px
+    );
+    animation: crt-flicker 6s steps(60) infinite;
   }
-  .blob.pink { width: 260px; height: 260px; background: #ff2d78; top: -60px; left: -60px; }
-  .blob.blue { width: 300px; height: 300px; background: #3d7bff; bottom: -80px; right: -70px; animation-delay: -3s; }
-  .blob.violet { width: 180px; height: 180px; background: #9b4dff; top: 45%; left: 60%; animation-delay: -6s; }
-  @keyframes float {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(30px, -25px) scale(1.12); }
+  @keyframes crt-flicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: .6; }
+    94% { opacity: 1; }
+    97% { opacity: .8; }
+    98% { opacity: 1; }
   }
 
-  .card {
+  .panel {
     position: relative;
     z-index: 2;
     width: 100%;
     max-width: 400px;
-    text-align: center;
-    background: rgba(255, 255, 255, .07);
-    border: 1px solid rgba(255, 255, 255, .14);
-    border-radius: 28px;
-    padding: 44px 28px 34px;
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-    box-shadow: 0 24px 60px rgba(0, 0, 0, .45);
+    background: var(--panel);
+    border: 1px solid var(--green-dim);
+    box-shadow: 0 0 24px rgba(0, 255, 157, .12), inset 0 0 40px rgba(0, 255, 157, .04);
+    padding: 40px 26px 30px;
   }
 
-  /* 旋转的 BETA 徽章 */
-  .badge {
+  /* 四角 HUD 括号 */
+  .panel::before, .panel::after,
+  .corner::before, .corner::after {
+    content: "";
     position: absolute;
-    top: -16px;
-    right: 22px;
-    background: linear-gradient(135deg, #ff2d78, #ff8a00);
-    color: #fff;
-    font-weight: 800;
-    font-size: 12px;
-    letter-spacing: 3px;
-    padding: 8px 16px;
-    border-radius: 50px;
-    box-shadow: 0 6px 18px rgba(255, 45, 120, .5);
-    animation: wiggle 3.5s ease-in-out infinite;
+    width: 18px; height: 18px;
+    border: 2px solid var(--green);
+    pointer-events: none;
   }
-  @keyframes wiggle {
-    0%, 100% { transform: rotate(-4deg); }
-    50% { transform: rotate(4deg); }
-  }
+  .panel::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+  .panel::after { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+  .corner::before { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+  .corner::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
 
-  .lab { font-size: 56px; line-height: 1; animation: bounce 2.4s ease-in-out infinite; }
-  @keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+  /* 顶部状态行 */
+  .status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--dim);
+    margin-bottom: 26px;
   }
+  .status .online { color: var(--green); }
+  .status .dot {
+    display: inline-block;
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    margin-right: 6px;
+    animation: blink 1.2s step-end infinite;
+  }
+  @keyframes blink { 50% { opacity: .15; } }
 
-  h1 {
-    margin-top: 18px;
+  /* 故障字标题 */
+  .glitch {
     font-size: 30px;
-    font-weight: 800;
-    letter-spacing: 5px;
-    background: linear-gradient(90deg, #ff2d78, #ff8a00, #ffd23d);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: var(--green);
+    text-align: center;
+    position: relative;
+    text-shadow: 0 0 12px rgba(0, 255, 157, .55);
+    animation: glitch 3.2s infinite;
+  }
+  @keyframes glitch {
+    0%, 86%, 100% { transform: translate(0); text-shadow: 0 0 12px rgba(0, 255, 157, .55); }
+    87% { transform: translate(-2px, 1px); text-shadow: -3px 0 var(--cyan), 3px 0 var(--amber); }
+    89% { transform: translate(2px, -1px); text-shadow: 3px 0 var(--cyan), -3px 0 var(--amber); }
+    91% { transform: translate(0); text-shadow: 0 0 12px rgba(0, 255, 157, .55); }
+    95% { transform: translate(1px, 0); text-shadow: -2px 0 var(--cyan), 2px 0 var(--amber); }
+    96% { transform: translate(0); }
   }
 
-  .en {
-    margin-top: 10px;
-    font-size: 11px;
-    letter-spacing: 5px;
-    color: rgba(255, 255, 255, .45);
+  .sub {
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--dim);
+    margin-top: 12px;
     text-transform: uppercase;
   }
 
-  .meta {
-    display: flex;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 26px;
-  }
-  .chip {
+  /* 终端读数区 */
+  .readout {
+    margin-top: 30px;
+    border-top: 1px dashed var(--green-dim);
+    border-bottom: 1px dashed var(--green-dim);
+    padding: 16px 4px;
     font-size: 12px;
+    line-height: 2.1;
     letter-spacing: 1px;
-    color: rgba(255, 255, 255, .85);
-    background: rgba(255, 255, 255, .10);
-    border: 1px solid rgba(255, 255, 255, .18);
-    padding: 7px 14px;
-    border-radius: 50px;
+    color: var(--dim);
   }
-  .chip b { font-weight: 700; color: #ffd23d; }
+  .readout .k { color: var(--cyan); }
+  .readout .v { color: var(--green); }
+  .readout .cursor {
+    display: inline-block;
+    width: 8px; height: 14px;
+    background: var(--green);
+    vertical-align: -2px;
+    animation: blink 1s step-end infinite;
+  }
 
+  /* 下载按钮 */
   .dl {
     display: block;
-    margin-top: 34px;
-    padding: 18px 20px;
-    border-radius: 50px;
-    background: linear-gradient(135deg, #ff2d78, #ff8a00);
-    color: #fff;
-    font-size: 17px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-decoration: none;
-    box-shadow: 0 10px 30px rgba(255, 45, 120, .45);
-    animation: pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(255, 45, 120, .45); }
-    50% { transform: scale(1.035); box-shadow: 0 14px 40px rgba(255, 138, 0, .6); }
-  }
-  .dl:active { transform: scale(.97); }
-
-  .note {
     margin-top: 30px;
-    font-size: 11px;
-    letter-spacing: 1px;
-    line-height: 2;
-    color: rgba(255, 255, 255, .5);
+    padding: 16px 12px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--green);
+    text-decoration: none;
+    border: 1px solid var(--green);
+    background: rgba(0, 255, 157, .07);
+    box-shadow: 0 0 18px rgba(0, 255, 157, .22), inset 0 0 18px rgba(0, 255, 157, .06);
+    transition: background .12s, box-shadow .12s;
+    animation: dl-pulse 2.4s ease-in-out infinite;
   }
-  .note span { color: #ffd23d; }
+  @keyframes dl-pulse {
+    0%, 100% { box-shadow: 0 0 18px rgba(0, 255, 157, .22), inset 0 0 18px rgba(0, 255, 157, .06); }
+    50% { box-shadow: 0 0 34px rgba(0, 255, 157, .45), inset 0 0 24px rgba(0, 255, 157, .12); }
+  }
+  .dl:active { background: var(--green); color: var(--bg); }
+
+  .foot {
+    margin-top: 28px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    line-height: 2.1;
+    color: var(--dim);
+    text-align: center;
+  }
+  .foot .warn { color: var(--amber); }
+
+  /* 底部装饰条 */
+  .hex {
+    margin-top: 22px;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: rgba(0, 255, 157, .28);
+    text-align: center;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 </style>
 </head>
 <body>
-  <div class="bg"></div>
-  <div class="blob pink"></div>
-  <div class="blob blue"></div>
-  <div class="blob violet"></div>
+  <div class="grid"></div>
+  <div class="scanlines"></div>
 
-  <div class="card">
-    <div class="badge">BETA</div>
-    <div class="lab">🧪</div>
-    <h1>测试实验室</h1>
-    <div class="en">PCPTHS · Developer Channel</div>
-
-    <div class="meta">
-      <div class="chip">版本 <b>1.0.3</b></div>
-      <div class="chip">代号 <b>5</b></div>
+  <div class="panel">
+    <div class="corner"></div>
+    <div class="status">
+      <span><span class="dot"></span><span class="online">ONLINE</span></span>
+      <span>PCPTHS-TEST-CHANNEL</span>
     </div>
 
-    <a class="dl" href="pcpths-android.apk">🚀 下载测试版</a>
+    <div class="glitch">普中摄影社</div>
+    <div class="sub">—— Developer Access Only ——</div>
 
-    <div class="note">
-      开发者专属通道 · 仅自己人使用<br>
+    <div class="readout">
+      &gt; 系统: 测试版通道 <span class="v">已连接</span><br>
+      &gt; 版本: <span class="k">VER</span> <span class="v">1.0.3</span><br>
+      &gt; 代号: <span class="k">BUILD</span> <span class="v">5</span><br>
+      &gt; 状态: <span class="v">待下载</span><span class="cursor"></span>
+    </div>
+
+    <a class="dl" href="pcpths-android.apk">[ 下载测试版 ]</a>
+
+    <div class="foot">
       测试版与正式版互不干扰，可同时安装<br>
-      应用名「<span>普中摄影社·测试</span>」<br>
-      安装时请允许「安装未知应用」
+      应用名「普中摄影社·测试」<br>
+      <span class="warn">▲ 安装时请允许「安装未知应用」</span>
     </div>
+
+    <div class="hex">0x50435054 0x4853 0x54455354 0x4B494C4C 0x45525357 0x49544348</div>
   </div>
 </body>
 </html>
